@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Blog</title>
+    <style>
+        body {
+            width: auto;
+            height: 90vh;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #blogForm {
+            border: 2px solid black;
+            padding: 10px;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+
+        input[type="text"] {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 150px;
+        /
+        }
+
+        select {
+            background-color: #fff;
+            cursor: pointer;
+            height: 25px;
+            width: 30%;
+        }
+    </style>
+</head>
+<body>
+<h1>Update Blog</h1>
+<form id="blogForm" onsubmit="updateBlog(event)" th:object="${blog}">
+    <input type="hidden" id="blogId" name="id" th:value="${blog.id}"/>
+
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" th:field="*{title}" required/> <br/>
+
+    <label for="content">Content:</label>
+    <textarea id="content" name="content" th:field="*{content}" required></textarea> <br/>
+
+    <label for="category">Category:</label>
+    <select id="category" name="category.id" th:field="*{category.id}" required>
+        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+    </select> <br/>
+
+    <label>Tags:</label>
+    <div>
+        <div th:each="tag : ${tags}">
+            <input type="checkbox" th:value="${tag.id}" name="tags"/>
+            <label th:text="${tag.name}"></label><br/>
+        </div>
+    </div>
+    <br/>
+
+    <button type="submit">Update Blog</button>
+</form>
+
+<script>
+    function updateBlog(event) {
+        event.preventDefault();
+
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+        const category = document.getElementById('category').value;
+        const tags = Array.from(document.querySelectorAll('input[name="tags"]:checked'))
+            .map(tag => tag.value);
+
+        const token = localStorage.getItem('token');
+
+        const blogId = document.getElementById('blogId').value;
+
+        fetch(`/api/blog/${blogId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                title,
+                content,
+                category,
+                tags
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Blog updated successfully');
+                    window.location.href = '/api/blog/blog-list';
+                } else {
+                    return response.text().then(text => {
+                        alert(`Failed to update blog: ${text}`);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the blog');
+            });
+    }
+</script>
+</body>
+</html>

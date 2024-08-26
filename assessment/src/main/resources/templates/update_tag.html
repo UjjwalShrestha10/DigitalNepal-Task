@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Tag</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: auto;
+            height: 90vh;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #tagForm {
+            border: 2px solid black;
+            padding: 10px;
+            font-size: 20px;
+            text-align: center;
+            width: 300px;
+        }
+
+        input[type="text"] {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Update Tag</h1>
+
+<form id="tagForm" onsubmit="updateTag(event)" th:object="${tag}">
+    <input type="hidden" id="tagId" name="id" th:value="${tag.id}">
+    <label for="name">Tag Name:</label>
+    <input type="text" id="name" name="name" th:value="${tag.name}" required>
+    <button type="submit">Update Tag</button>
+</form>
+
+<script>
+    function updateTag(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+
+        const tagId = document.getElementById('tagId').value;
+
+        const token = localStorage.getItem('token');
+
+        fetch(`/api/tag/${tagId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                name: name
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Tag updated successfully');
+                window.location.href = '/api/tag/tag-list';
+            } else {
+                response.text().then(text => alert(`Failed to update tag: ${text}`));
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the tag');
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Blog List</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: auto;
+            height: 90vh;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        button a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .edit {
+            background-color: #007BFF;
+            border: none;
+        }
+        .delete{
+            background-color: red;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Blog List</h1>
+
+<button><a href="/api/blog/page">Create New Blog</a></button>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Category</th>
+        <th>Tags</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="blog : ${blogs}">
+        <td th:text="${blog.id}"></td>
+        <td th:text="${blog.title}"></td>
+        <td th:text="${blog.content}"></td>
+        <td th:text="${blog.category.name}"></td>
+        <td>
+            <ul>
+                <li th:each="tag : ${blog.tags}" th:text="${tag.name}"></li>
+            </ul>
+        </td>
+        <td>
+            <button class="edit"><a th:href="@{/api/blog/update/page/{id}(id=${blog.id})}">Edit</a></button>
+            <button class="delete"><a href="#" th:onclick="'deleteBlog(\'' + ${blog.id} + '\');'">Delete</a></button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function deleteBlog(blogId) {
+        const token = localStorage.getItem('token');
+
+        if (!confirm('Are you sure you want to delete this blog?')) {
+            return;
+        }
+
+        fetch(`/api/blog/${blogId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Blog deleted successfully');
+                    window.location.reload();
+                } else {
+                    response.text().then(text => alert(`Failed to delete blog: ${text}`));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the blog');
+            });
+    }
+</script>
+
+</body>
+</html>

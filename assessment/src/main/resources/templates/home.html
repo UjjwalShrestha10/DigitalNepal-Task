@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: whitesmoke;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 50px;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard a {
+            text-decoration: none;
+            color: #007BFF;
+            font-size: 20px;
+            margin: 10px;
+            width: 25%;
+            text-align: center;
+        }
+
+        .dashboard a:hover {
+            text-decoration: underline;
+        }
+
+        .blogs {
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .blog-card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .blog-card {
+            width: 45%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+        .blog-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .blog-card-title {
+            font-size: 24px;
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .blog-card-content {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<h1>Home</h1>
+<div class="dashboard">
+    <a href="/api/blog/page">Create New Blog</a>
+    <a href="/api/blog/blog-list">Manage Blogs</a>
+    <a href="/api/category/category-list">Manage Categories</a>
+    <a href="/api/tag/tag-list">Manage Tags</a>
+</div>
+<div class="blogs">
+    <h2>Recent Blogs:</h2>
+</div>
+<div class="blog-card-container">
+    <div th:each="blog : ${latestBlogs}" class="blog-card">
+        <h2 class="blog-card-title" th:text="${blog.title}"></h2>
+        <p class="blog-card-content" th:text="${blog.content}"></p>
+    </div>
+</div>
+</body>
+</html>

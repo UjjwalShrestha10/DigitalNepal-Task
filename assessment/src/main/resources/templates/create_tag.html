@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Tag</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: auto;
+            height: 90vh;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #tagForm {
+            border: 2px solid black;
+            padding: 10px;
+            font-size: 20px;
+            text-align: center;
+            width: 300px;
+        }
+
+        input[type="text"] {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Create New Tag</h1>
+
+<form id="tagForm" onsubmit="createTag(event)">
+    <label for="name">Tag Name:</label>
+    <input type="text" id="name" name="name" required>
+    <button type="submit">Create Tag</button>
+</form>
+
+<script>
+    function createTag(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+
+        const token = localStorage.getItem('token');
+
+        fetch('/api/tag', {
+            method: 'POST',
+            body: JSON.stringify({
+                name: name
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Tag created successfully');
+                window.location.href = '/api/tag/tag-list';
+            } else {
+                response.text().then(text => alert(`Failed to create tag: ${text}`));
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while creating the tag');
+        });
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tag List</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: auto;
+            height: 90vh;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        button a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .edit {
+            background-color: #007BFF;
+            border: none;
+        }
+
+        .delete {
+            background-color: red;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Tag List</h1>
+
+<button><a href="/api/tag/page">Create New Tag</a></button>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="tag : ${tags}">
+        <td th:text="${tag.id}"></td>
+        <td th:text="${tag.name}"></td>
+        <td>
+            <button class="edit"><a th:href="@{/api/tag/update/page/{id}(id=${tag.id})}">Edit</a></button>
+            <button class="delete"><a href="#" th:onclick="'deleteTag(\'' + ${tag.id} + '\');'">Delete</a></button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    function deleteTag(tagId) {
+        const token = localStorage.getItem('token');
+
+        if (!confirm('Are you sure you want to delete this tag?')) {
+            return;
+        }
+
+        fetch(`/api/tag/${tagId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Tag deleted successfully');
+                window.location.reload();
+            } else {
+                response.text().then(text => alert(`You can only delete unused tags`));
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the tag');
+        });
+    }
+</script>
+
+</body>
+</html>
